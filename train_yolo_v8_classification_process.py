@@ -115,8 +115,7 @@ class TrainYoloV8Classification(dnntrain.TrainProcess):
         dataset_folder = path_input.get_path()
 
         # Create a YOLO model instance
-        self.device = torch.device(
-            "cuda:0") if torch.cuda.is_available() else torch.device("cpu")
+        self.device = 0 if torch.cuda.is_available() else torch.device("cpu")
         if param.cfg["config_file"]:
             # Load the YAML config file
             with open(param.cfg["config_file"], 'r') as file:

@@ -115,7 +115,8 @@ class TrainYoloV8Classification(dnntrain.TrainProcess):
         dataset_folder = path_input.get_path()
 
         # Create a YOLO model instance
-        self.device = 1 if torch.cuda.is_available() else torch.device("cpu")
+        self.device = torch.device(
+            "cuda") if torch.cuda.is_available() else torch.device("cpu")
         if param.cfg["config_file"]:
             # Load the YAML config file
             with open(param.cfg["config_file"], 'r') as file:
@@ -136,7 +137,6 @@ class TrainYoloV8Classification(dnntrain.TrainProcess):
         output_folder = os.path.join(
             param.cfg["output_folder"], experiment_name)
         os.makedirs(output_folder, exist_ok=True)
-
 
         # Train the model
         if param.cfg["config_file"]:
@@ -179,7 +179,7 @@ class TrainYoloV8ClassificationFactory(dataprocess.CTaskFactory):
         # Set process information as string here
         self.info.name = "train_yolo_v8_classification"
         self.info.short_description = "Train YOLOv8 classification models."
-        self.info.description = "This plugin proposes train on YOLOv8 image classification models."
+        self.info.description = "This algorithm proposes train on YOLOv8 image classification models."
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Classification"
         self.info.version = "1.0.0"

@@ -189,7 +189,6 @@ class TrainYoloV8ClassificationFactory(dataprocess.CTaskFactory):
         # Set process information as string here
         self.info.name = "train_yolo_v8_classification"
         self.info.short_description = "Train YOLOv8 classification models."
-        self.info.description = "This algorithm proposes train on YOLOv8 image classification models."
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Classification"
         self.info.version = "1.0.1"
@@ -205,6 +204,8 @@ class TrainYoloV8ClassificationFactory(dataprocess.CTaskFactory):
         self.info.repository = "https://github.com/ultralytics/ultralytics"
         # Keywords used for search
         self.info.keywords = "YOLO, classification, ultralytics, imagenet"
+        self.info.algo_type = core.AlgoType.TRAIN
+        self.info.algo_tasks = "CLASSIFICATION"
 
     def create(self, param=None):
         # Create process object

@@ -45,7 +45,6 @@ class TrainYoloV8ClassificationParam(TaskParam):
         self.cfg["epochs"] = 100
         self.cfg["batch_size"] = 8
         self.cfg["input_size"] = 640
-        self.cfg["dataset_split_ratio"] = 0.9
         self.cfg["workers"] = 0
         self.cfg["optimizer"] = "auto"
         self.cfg["weight_decay"] = 0.0005
@@ -64,13 +63,10 @@ class TrainYoloV8ClassificationParam(TaskParam):
         self.cfg["input_size"] = int(param_map["input_size"])
         self.cfg["workers"] = int(param_map["workers"])
         self.cfg["optimizer"] = str(param_map["optimizer"])
-        self.cfg["weight_decay"] = float(param_map["weight_decay"])
         self.cfg["momentum"] = float(param_map["momentum"])
         self.cfg["lr0"] = float(param_map["lr0"])
         self.cfg["lrf"] = float(param_map["lrf"])
         self.cfg["config_file"] = param_map["config_file"]
-        self.cfg["dataset_split_ratio"] = float(
-            param_map["dataset_split_ratio"])
         self.cfg["output_folder"] = str(param_map["output_folder"])
 
 

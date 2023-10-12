@@ -68,15 +68,6 @@ class TrainYoloV8ClassificationWidget(core.CWorkflowTaskWidget):
         self.spin_batch = pyqtutils.append_spin(
             self.grid_layout, "Batch size", self.parameters.cfg["batch_size"])
 
-        # Train test split
-        self.spin_train_test_split = pyqtutils.append_double_spin(
-            self.grid_layout,
-            "Test image percentage",
-            self.parameters.cfg["dataset_split_ratio"],
-            min=0.01, max=1.0,
-            step=0.05, decimals=2
-        )
-
         # Hyper-parameters
         custom_hyp = bool(self.parameters.cfg["config_file"])
         self.check_hyp = QCheckBox("Custom hyper-parameters")
@@ -121,8 +112,6 @@ class TrainYoloV8ClassificationWidget(core.CWorkflowTaskWidget):
         self.parameters.cfg["dataset_folder"] = self.browse_dataset_folder.path
         self.parameters.cfg["epochs"] = self.spin_epochs.value()
         self.parameters.cfg["batch_size"] = self.spin_batch.value()
-        self.parameters.cfg["dataset_split_ratio"] = self.spin_train_test_split.value(
-        )
         self.parameters.cfg["output_folder"] = self.browse_out_folder.path
         if self.check_hyp.isChecked():
             self.parameters.cfg["config_file"] = self.browse_hyp_file.path

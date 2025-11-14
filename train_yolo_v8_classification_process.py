@@ -15,20 +15,22 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import copy
+import os
+import yaml
+from datetime import datetime
+
+import torch
+
 from ikomia import core, dataprocess
 from ikomia.core.task import TaskParam
 from ikomia.dnn import dnntrain
-import os
-import yaml
-from ultralytics import YOLO
-from datetime import datetime
-import torch
-from train_yolo_v8_classification.utils import custom_callbacks
-from ultralytics import download
 
+from ultralytics import YOLO
 from ultralytics import download, settings
+
+from train_yolo_v8_classification.utils import custom_callbacks
+
 
 # Update a setting
 settings.update({'mlflow': False})
@@ -37,14 +39,11 @@ settings.update({'mlflow': False})
 # - Class to handle the process parameters
 # - Inherits PyCore.CWorkflowTaskParam from Ikomia API
 # --------------------
-
-
 class TrainYoloV8ClassificationParam(TaskParam):
 
     def __init__(self):
         TaskParam.__init__(self)
-        dataset_folder = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "dataset")
+        dataset_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "dataset")
         self.cfg["dataset_folder"] = dataset_folder
         self.cfg["model_name"] = "yolov8m-cls"
         self.cfg["epochs"] = 100
@@ -57,8 +56,7 @@ class TrainYoloV8ClassificationParam(TaskParam):
         self.cfg["lr0"] = 0.01
         self.cfg["lrf"] = 0.01
         self.cfg["config_file"] = ""
-        self.cfg["output_folder"] = os.path.dirname(
-            os.path.realpath(__file__)) + "/runs/"
+        self.cfg["output_folder"] = os.path.dirname(os.path.realpath(__file__)) + "/runs/"
 
     def set_values(self, param_map):
         self.cfg["dataset_folder"] = str(param_map["dataset_folder"])
@@ -125,28 +123,29 @@ class TrainYoloV8Classification(dnntrain.TrainProcess):
             # Load the YAML config file
             with open(param.cfg["config_file"], 'r') as file:
                 config_file = yaml.safe_load(file)
+
             self.model_weights = config_file["model"]
         else:
             # Set path
-            model_folder = os.path.join(os.path.dirname(
-                os.path.realpath(__file__)), "weights")
-            self.model_weights = os.path.join(
-                str(model_folder), f'{param.cfg["model_name"]}.pt')
+            model_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "weights")
+            self.model_weights = os.path.join(str(model_folder), f'{param.cfg["model_name"]}.pt')
+
             # Download model if not exist
             if not os.path.isfile(self.model_weights):
                 url = f'https://github.com/{self.repo}/releases/download/{self.version}/{param.cfg["model_name"]}.pt'
                 download(url=url, dir=model_folder, unzip=True)
+
         self.model = YOLO(self.model_weights)
 
         # Add custom MLflow callback to the model
         self.model.add_callback(
-            'on_fit_epoch_end', custom_callbacks.on_fit_epoch_end)
+            'on_fit_epoch_end', custom_callbacks.on_fit_epoch_end
+        )
 
         # Create output folder
         experiment_name = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         os.makedirs(param.cfg["output_folder"], exist_ok=True)
-        output_folder = os.path.join(
-            param.cfg["output_folder"], experiment_name)
+        output_folder = os.path.join(param.cfg["output_folder"], experiment_name)
         os.makedirs(output_folder, exist_ok=True)
 
         # Train the model
@@ -154,7 +153,6 @@ class TrainYoloV8Classification(dnntrain.TrainProcess):
             # Extract the custom argument-value pairs
             custom_args = {k: v for k, v in config_file.items()}
             self.model.train(**custom_args)
-
         else:
             self.model.train(
                 data=dataset_folder,
@@ -195,7 +193,8 @@ class TrainYoloV8ClassificationFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Train YOLOv8 classification models."
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Classification"
-        self.info.version = "1.1.1"
+        self.info.version = "1.2.0"
+        self.info.min_ikomia_version = "0.15.0"
         self.info.icon_path = "icons/icon.png"
         self.info.authors = "Jocher, G., Chaurasia, A., & Qiu, J"
         self.info.article = "YOLO by Ultralytics"
@@ -210,6 +209,10 @@ class TrainYoloV8ClassificationFactory(dataprocess.CTaskFactory):
         self.info.keywords = "YOLO, classification, ultralytics, imagenet"
         self.info.algo_type = core.AlgoType.TRAIN
         self.info.algo_tasks = "CLASSIFICATION"
+        self.info.hardware_config.min_cpu = 4
+        self.info.hardware_config.min_ram = 16
+        self.info.hardware_config.gpu_required = True
+        self.info.hardware_config.min_vram = 16
 
     def create(self, param=None):
         # Create process object

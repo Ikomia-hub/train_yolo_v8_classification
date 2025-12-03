@@ -193,7 +193,7 @@ class TrainYoloV8ClassificationFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Train YOLOv8 classification models."
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Classification"
-        self.info.version = "1.2.0"
+        self.info.version = "1.2.1"
         self.info.min_ikomia_version = "0.15.0"
         self.info.icon_path = "icons/icon.png"
         self.info.authors = "Jocher, G., Chaurasia, A., & Qiu, J"
